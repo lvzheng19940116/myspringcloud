@@ -1,0 +1,92 @@
+
+server:
+  port: 6666
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/fly?characterEncoding=utf-8&useSSL=false
+  zipkin:
+    base-url: http://localhost:5555/
+  sleuth:
+    sampler:
+      percentage: 1 #zipkin采样率，默认为0.1，改为1后全采样，但是会降低接口调用效率    
+  application:
+      name: zheng-service
+
+management:
+  security:
+    enabled: false
+
+eureka:
+  instance:
+    preferIpAddress: true    
+#    lease-expiration-duration-in-seconds: 30  # 续约更新时间间隔（默认30秒）
+#    lease-renewal-interval-in-seconds: 10 # 续约到期时间（默认90秒）
+  client:
+    service-url:
+      defaultZone: http://localhost:8888/eureka/
+#    healthcheck:
+#      enabled: true # 开启健康检查（需要spring-boot-starter-actuator依赖）
+      
+zuul:
+  routes:
+    api-a:
+      path: /api-a/**
+      serviceId: lv-service
+#    api-b:
+#      path: /api-b/**
+#      serviceId: zheng-service
+#  ignored-patterns: /**/provide-user/** # 忽略所有包含/provide-user/的路径  路由优先级：先配置优先级高
+#  prefix: /api   #全局配置路由  不要跟子路由字母重复
+#  strip-prefix: true  #开启全局路由/false 关闭
+#  sensitive-headers:  携带所有请求头
+#  add-host-header: true  #解决登陆之后重定向
+#  routes:  没用
+#    <routeName>: 没有用
+#      custom-sensitive-headers: true #指定服务开启请求头
+#      sensitive-headers:  #指定服务开启请求头
+
+#hystrix:
+#  threadpool:
+#    default:
+#      coreSize: 500  #并发执行的最大线程数，默认10
+#  command:
+#    paas-file:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 3600000
+#    default:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 8000  #命令执行超时时间，默认1000ms  断路器的超时时间大于ribbon超时时间，不然不会触发重试
+#
+#ribbon:
+#  ReadTimeout: 60000    #请求链接的超时时间
+#  ConnectTimeout: 60000  #请求处理的超时时间
+#  MaxAutoRetries: 1    #  对当前实例的重试次数
+#  MaxAutoRetriesNextServer: 2   #切换实例的重试次数
+#  OkToRetryOnAllOperations: true   #对所有操作请求都进行重试
+
+#不使用服务治理单实例配置路由
+#zuul:
+#  routes:
+#    user-route: # user-route只是给路由一个名称，可以随便命名
+#     url: http://localhost:5200/ #指定URL
+#     path: /movie/**  # URL对应的路径
+#不使用服务治理多实例配置路由
+#zuul:
+#  routes:
+#    user-route: 
+#     path: /user/** 
+#     service-id: provide-user
+#  ignored-patterns: /**/provide-user/** # 忽略所有包含/provide-user/的路径
+#ribbon: 
+#  eureka: 
+#    enabled: false  # 为Ribbon禁用Eureka
+#provide-user: # 这边是serviceId
+#  ribbon: 
+#    listOfServers: http://localhost:4011,http://localhost:4012
